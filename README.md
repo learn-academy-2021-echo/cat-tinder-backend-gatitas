@@ -1,24 +1,33 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+###
+Created Rails application
 
-Things you may want to cover:
+Created main branch, pushed initial commit
 
-* Ruby version
+$ rails generate resource Cat name:string age:integer enjoys:text image:text
+$ cd cat-tinder-backend
+$ db:migrate
+$ rspec spec
+  verified it's installed
+$ rails db:seed
+  verified seeds file
+  verified could add cat from rails c
 
-* System dependencies
+### CORS
+added skip_before_action :verify_authenticity_token to ApplicationController
 
-* Configuration
+added gem 'rack-cors', :require => 'rack/cors' to Gemfile
 
-* Database creation
+Add a file to the config/initializers directory named cors.rb
+Rails.application.config.middleware.insert_before 0, Rack::Cors do
+  allow do
+    origins '*'  # <- change this to allow requests from any domain while in development.
 
-* Database initialization
+    resource '*',
+      headers: :any,
+      methods: [:get, :post, :put, :patch, :delete, :options, :head]
+  end
+end
 
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+Run the command $ bundle from the command line to update the dependencies.
