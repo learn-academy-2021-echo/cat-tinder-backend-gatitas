@@ -17,7 +17,7 @@ describe "GET /index" do
       expect(cat.length).to eq 1
     end
   end
-describe "POST /create" do
+  describe "POST /create" do
     it "creates a cat" do
       # The params we are going to send with the request
       cat_params = {
@@ -40,6 +40,26 @@ describe "POST /create" do
     # Assure that the created cat has the correct attributes
     expect(cat.name).to eq 'Buster'
   end
+
+  it "doesn't create a cat without a name" do
+    cat_params = {
+      cat: {
+        age: 2,
+        enjoys: 'Walks in the park',
+        image: 'https://images.unsplash.com/photo-1529778873920-4da4926a72c2?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1036&q=80'
+      }
+    }
+    # Send the request to the  server
+    post '/cats', params: cat_params
+    # expect an error if the cat_params does not have a name
+    expect(response.status).to eq 422
+    # Convert the JSON response into a Ruby Hash
+    json = JSON.parse(response.body)
+    # Errors are returned as an array because there could be more than one, if there are more than one validation failures on an attribute.
+    expect(json['name']).to include "can't be blank"
+  end
+
+
 end
 
 describe "PATCH /update" do
@@ -77,16 +97,55 @@ describe "PATCH /update" do
     expect(updated_cat.name).to eq 'Duster'
     expect(updated_cat.age).to eq 5
   end
+
+  it "doesn't create a cat update without a name" do
+    cat_params = {
+      cat: {
+        name: 'leo',
+        age: 2,
+        enjoys: 'Walks in the park',
+        image: 'https://images.unsplash.com/photo-1529778873920-4da4926a72c2?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1036&q=80'
+      }
+    }
+    # Send the request to the  server
+    post '/cats', params: cat_params
+    
+    cat = Cat.first
+
+    #let's update the cat
+    updated_cat_params = {
+      cat: {
+        name: nil,
+        age: 5,
+        enjoys: 'Meow Mix, and plenty of sunshine.',
+        image: 'https://images.unsplash.com/photo-1529778873920-4da4926a72c2?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1036&q=80'
+      }
+    }
+
+    patch "/cats/#{cat.id}", params: updated_cat_params
+    # Assure that we get a success back
+
+    updated_cat = Cat.find(cat.id)
+
+    # expect an error if the cat_params does not have a name
+    expect(response.status).to eq 422
+    # Convert the JSON response into a Ruby Hash
+    json = JSON.parse(response.body)
+    # Errors are returned as an array because there could be more than one, if there are more than one validation failures on an attribute.
+    expect(json['name']).to include "can't be blank"
+  end
+
 end
 
-describe "DELETE /destroy" do
+  describe "DELETE /destroy" do
     it 'deletes a cat' do
       # create a cat
       cat_params = {
         cat: {
           name: 'Felix',
           age: 4,
-          enjoys: 'Walks in the park.'
+          enjoys: 'Walks in the park.',
+          image: 'https://images.unsplash.com/photo-1529778873920-4da4926a72c2?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1036&q=80'
         }
       }
       post '/cats', params: cat_params
